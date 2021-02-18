@@ -10,7 +10,11 @@ export const getFinancialItem = (symbol) => async dispatch => {
     let financialChartHighValuesFunction = [];
     let financialChartLowValuesFunction = [];
 
+    let financialChartXValuesFunctionDict = {};
+    let timeSeries = {};
+
     try{
+        for (let i = 0; i < 1; i++){
          await fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${finItemSymbol}&outputsize=compact&apikey=${API_KEY}`)
             .then(
                 function(response) {
@@ -23,13 +27,32 @@ export const getFinancialItem = (symbol) => async dispatch => {
 
                     for (let key in data['Time Series (Daily)']) {
                         financialChartXValuesFunction.push(key);
-                        financialChartCloseValuesFunction.push(data['Time Series (Daily)'][key]['4. close']);
-                        financialChartOpenValuesFunction.push(data['Time Series (Daily)'][key]['1. open']);
-                        financialChartHighValuesFunction.push(data['Time Series (Daily)'][key]['2. high']);
-                        financialChartLowValuesFunction.push(data['Time Series (Daily)'][key]['3. low']);
+                        if (key in timeSeries){
+                            timeSeries[key]['4. close'] =  timeSeries[key]['4. close'] + data['Time Series (Daily)'][key]['4. close'];
+                            timeSeries[key]['1. open'] =  timeSeries[key]['1. open'] + data['Time Series (Daily)'][key]['1. open'];
+                            timeSeries[key]['2. high'] =  timeSeries[key]['2. high'] + data['Time Series (Daily)'][key]['2. high'];
+                            timeSeries[key]['3. low'] =  timeSeries[key]['3. low'] + data['Time Series (Daily)'][key]['3. low'];
+                        }
+                        else{
+                            timeSeries[key] = {'4. close': 0, '1. open':0, '2. high': 0, '3. low': 0}
+                            timeSeries[key]['4. close'] =  data['Time Series (Daily)'][key]['4. close'];
+                            timeSeries[key]['1. open'] =   data['Time Series (Daily)'][key]['1. open'];
+                            timeSeries[key]['2. high'] =   data['Time Series (Daily)'][key]['2. high'];
+                            timeSeries[key]['3. low'] =   data['Time Series (Daily)'][key]['3. low'];    
+                        }
+
                     }
 
                 })
+        }
+
+        for (let key in timeSeries) {
+            financialChartXValuesFunction.push(key);
+            financialChartCloseValuesFunction.push(timeSeries[key]['4. close']);
+            financialChartOpenValuesFunction.push(timeSeries[key]['1. open']);
+            financialChartHighValuesFunction.push(timeSeries[key]['2. high']);
+            financialChartLowValuesFunction.push(timeSeries[key]['3. low']);
+        }
 
         const financialItem = {
             symbol: finItemSymbol,
