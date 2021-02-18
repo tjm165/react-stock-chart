@@ -14,7 +14,7 @@ export const getFinancialItem = (symbol) => async dispatch => {
     let timeSeries = {};
 
     try{
-        for (let i = 0; i < 1; i++){
+        for (let i = 0; i < 2; i++){
          await fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${finItemSymbol}&outputsize=compact&apikey=${API_KEY}`)
             .then(
                 function(response) {
@@ -23,15 +23,13 @@ export const getFinancialItem = (symbol) => async dispatch => {
             )
             .then(
                 function(data) {
-                    console.log(data);
 
                     for (let key in data['Time Series (Daily)']) {
-                        financialChartXValuesFunction.push(key);
                         if (key in timeSeries){
-                            timeSeries[key]['4. close'] =  timeSeries[key]['4. close'] + data['Time Series (Daily)'][key]['4. close'];
-                            timeSeries[key]['1. open'] =  timeSeries[key]['1. open'] + data['Time Series (Daily)'][key]['1. open'];
-                            timeSeries[key]['2. high'] =  timeSeries[key]['2. high'] + data['Time Series (Daily)'][key]['2. high'];
-                            timeSeries[key]['3. low'] =  timeSeries[key]['3. low'] + data['Time Series (Daily)'][key]['3. low'];
+                            timeSeries[key]['4. close'] =  parseFloat(timeSeries[key]['4. close']) + parseFloat(data['Time Series (Daily)'][key]['4. close']);
+                            timeSeries[key]['1. open'] =  parseFloat(timeSeries[key]['1. open']) + parseFloat(data['Time Series (Daily)'][key]['1. open']);
+                            timeSeries[key]['2. high'] =  parseFloat(timeSeries[key]['2. high']) + parseFloat(data['Time Series (Daily)'][key]['2. high']);
+                            timeSeries[key]['3. low'] =  parseFloat(timeSeries[key]['3. low']) + parseFloat(data['Time Series (Daily)'][key]['3. low']);
                         }
                         else{
                             timeSeries[key] = {'4. close': 0, '1. open':0, '2. high': 0, '3. low': 0}
