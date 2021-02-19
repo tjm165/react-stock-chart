@@ -2,7 +2,7 @@ import {GET_FINANCIAL_ITEM} from "./types";
 
 export const getFinancialItem = (symbol) => async dispatch => {
     const API_KEY = '9SEJV46K465GDV17';
-    let finItemSymbol = symbol;
+    let finItemSymbols = {"TSLA" : {"shares": 1}, "SPY": {"shares": 1}}
 
     let financialChartXValuesFunction = [];
     let financialChartCloseValuesFunction = [];
@@ -10,11 +10,14 @@ export const getFinancialItem = (symbol) => async dispatch => {
     let financialChartHighValuesFunction = [];
     let financialChartLowValuesFunction = [];
 
-    let financialChartXValuesFunctionDict = {};
     let timeSeries = {};
+    
 
     try{
-        for (let i = 0; i < 2; i++){
+        for (let key in finItemSymbols){
+            const finItemSymbol = key
+            const numShares = finItemSymbols[key]["shares"]
+
          await fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${finItemSymbol}&outputsize=compact&apikey=${API_KEY}`)
             .then(
                 function(response) {
@@ -53,7 +56,7 @@ export const getFinancialItem = (symbol) => async dispatch => {
         }
 
         const financialItem = {
-            symbol: finItemSymbol,
+            symbol: "finItemSymbol",
             financialChartXValues: financialChartXValuesFunction,
             financialChartCloseValues: financialChartCloseValuesFunction,
             financialChartOpenValues: financialChartOpenValuesFunction,
